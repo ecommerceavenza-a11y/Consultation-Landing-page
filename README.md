@@ -29,6 +29,7 @@ The form sends consultation requests directly from the visitor's browser to `rum
 
 1. Import this project into Vercel.
 2. Keep the detected framework as **Next.js**.
+   Keep the Output Directory at its default (`.next`) and the Build Command as `npm run build`.
 3. Add `NEXT_PUBLIC_SITE_URL` with the final production URL, such as `https://example.com`.
 4. Add `NEXT_PUBLIC_VIMEO_VIDEO_URL` with the Vimeo video URL to enable the thank-you-page player.
 5. Deploy.
