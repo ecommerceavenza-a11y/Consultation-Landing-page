@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Check, MessageCircle, Play } from "lucide-react";
+import { Check, MessageCircle } from "lucide-react";
 import { Header } from "@/components/Header";
 
 export const metadata: Metadata = {
@@ -12,7 +12,8 @@ const whatsappMessage = encodeURIComponent(
   "Hi, I just submitted my consultation request. I’d like to connect with you on WhatsApp and discuss the next steps.",
 );
 const whatsappUrl = `https://wa.me/9779745727478?text=${whatsappMessage}`;
-const vimeoId = getVimeoId(process.env.NEXT_PUBLIC_VIMEO_VIDEO_URL);
+const configuredVimeoId = getVimeoId(process.env.NEXT_PUBLIC_VIMEO_VIDEO_URL);
+const vimeoId = configuredVimeoId ?? "945577561";
 
 function getVimeoId(value?: string) {
   if (!value) return null;
@@ -58,26 +59,21 @@ export default function ThankYouPage() {
               Watch this video
             </h2>
             <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-[#172019]/10 bg-[#172019] shadow-[0_24px_70px_rgba(23,32,25,0.14)]">
-              {vimeoId ? (
-                <iframe
-                  src={`https://player.vimeo.com/video/${vimeoId}`}
-                  title="Watch this video on Vimeo"
-                  className="aspect-video w-full"
-                  allow="fullscreen; picture-in-picture"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                />
-              ) : (
-                <div className="flex aspect-video flex-col items-center justify-center px-6 text-white">
-                  <span className="grid h-16 w-16 place-items-center rounded-full bg-[#f5c84c] text-[#172019]">
-                    <Play aria-hidden="true" className="ml-1 h-6 w-6" fill="currentColor" />
-                  </span>
-                  <p className="mt-5 text-sm font-semibold text-white/80">
-                    Add your Vimeo video URL to enable playback.
-                  </p>
-                </div>
-              )}
+              <iframe
+                src={`https://player.vimeo.com/video/${vimeoId}`}
+                title={configuredVimeoId ? "Watch this video on Vimeo" : "Sample video: Introduction to digital marketing"}
+                className="block aspect-video w-full"
+                allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+                referrerPolicy="strict-origin-when-cross-origin"
+                loading="lazy"
+                allowFullScreen
+              />
             </div>
+            {!configuredVimeoId && (
+              <p className="mt-3 text-sm text-[#5f695f]">
+                Sample video: Introduction to digital marketing.
+              </p>
+            )}
           </section>
 
           <a

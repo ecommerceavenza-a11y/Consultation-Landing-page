@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, ArrowRight, Loader2, LockKeyhole } from "lucide-react";
+import { AlertCircle, ArrowRight, Loader2, LockKeyhole, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -85,6 +85,7 @@ const fields: Array<{
 export function CTAForm() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState("");
+  const [whatsappUrl, setWhatsappUrl] = useState("https://wa.me/9779745727478");
   const {
     register,
     handleSubmit,
@@ -104,10 +105,23 @@ export function CTAForm() {
 
   async function submitForm(values: FormValues) {
     setSubmitError("");
+    const whatsappMessage = [
+      "Hi, I’d like to book a free digital marketing consultation. I couldn’t confirm my request through the website.",
+      `Full Name: ${values.fullName}`,
+      `Email: ${values.email}`,
+      `WhatsApp Number: ${values.whatsapp}`,
+      `Business Name: ${values.businessName}`,
+      ...(values.website ? [`Website or Facebook URL: ${values.website}`] : []),
+      ...(values.message ? [`Message: ${values.message}`] : []),
+    ].join("\n");
+    setWhatsappUrl(`https://wa.me/9779745727478?text=${encodeURIComponent(whatsappMessage)}`);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 20000);
 
     try {
       const response = await fetch(formSubmitEndpoint, {
         method: "POST",
+        signal: controller.signal,
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
@@ -136,13 +150,12 @@ export function CTAForm() {
       }
 
       router.push("/thank-you");
-    } catch (error) {
-      const message = error instanceof Error ? error.message : "";
+    } catch {
       setSubmitError(
-        message.toLowerCase().includes("activation")
-          ? "One-time activation is required. Open the FormSubmit email sent to rumbamanjit886@gmail.com, click “Activate Form,” then submit again."
-          : message || "Your request could not be sent. Please try again or message us on WhatsApp.",
+        "We couldn’t confirm your consultation request. Please try again or connect with me on WhatsApp to arrange your free consultation.",
       );
+    } finally {
+      window.clearTimeout(timeoutId);
     }
   }
 
@@ -234,7 +247,19 @@ export function CTAForm() {
                 role="alert"
               >
                 <AlertCircle aria-hidden="true" className="mt-1 h-4 w-4 shrink-0" />
-                <p>{submitError}</p>
+                <div>
+                  <p>{submitError}</p>
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#172019] px-4 py-2 font-semibold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#172019]"
+                  >
+                    <MessageCircle aria-hidden="true" className="h-4 w-4 shrink-0" />
+                    Connect with me on WhatsApp
+                  </a>
+                  <p className="mt-2 text-xs">Your details will be ready to send in WhatsApp.</p>
+                </div>
               </div>
             )}
 
